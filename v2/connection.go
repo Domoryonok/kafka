@@ -352,6 +352,17 @@ func (c *connection) CreateTopic(req *proto.CreateTopicsReq) (*proto.CreateTopic
 	return proto.ReadCreateTopicsResp(bytes.NewReader(b))
 }
 
+// DeleteTopic sends given deleteTopic request to kafka node and returns related
+// response.
+// Calling this method on closed connection will always return ErrClosed.
+func (c *connection) DeleteTopic(req *proto.DeleteTopicsReq) (*proto.DeleteTopicsResp, error) {
+	b, err := c.sendRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return proto.ReadDeleteTopicsResp(bytes.NewReader(b))
+}
+
 // Produce sends given produce request to kafka node and returns related
 // response. Sending request with no ACKs flag will result with returning nil
 // right after sending request, without waiting for response.

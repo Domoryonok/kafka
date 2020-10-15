@@ -294,6 +294,22 @@ func (b *Broker) CreateTopic(topics []proto.TopicInfo, timeout time.Duration, va
 	return resp, err
 }
 
+// DeleteTopic request topic delition
+func (b *Broker) DeleteTopic(topics []string) (*proto.DeleteTopicsResp, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	var resp *proto.DeleteTopicsResp
+	err := b.callOnClusterController(func(c *connection) error {
+		var err error
+		req := proto.DeleteTopicsReq{
+			Topics: topics,
+		}
+		resp, err = c.DeleteTopic(&req)
+		return err
+	})
+	return resp, err
+}
+
 // refreshMetadata is requesting metadata information from any node and refresh
 // internal cached representation.
 // Because it's changing internal state, this method requires lock protection,
