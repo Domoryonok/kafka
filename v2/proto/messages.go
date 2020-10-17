@@ -2598,6 +2598,8 @@ func (r *DeleteTopicsReq) Bytes() ([]byte, error) {
 		return nil, enc.Err()
 	}
 
+	enc.EncodeDuration(r.Timeout)
+
 	// update the message size information
 	b := buf.Bytes()
 	binary.BigEndian.PutUint32(b, uint32(len(b)-4))
