@@ -1,3 +1,3 @@
-module github.com/optiopay/kafka
+module github.com/Domoryonok/kafka
 
 go 1.13
