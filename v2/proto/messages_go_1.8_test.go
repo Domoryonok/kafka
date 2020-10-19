@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func TestProduceRequest(t *testing.T) {
+func TestProduceRequest18(t *testing.T) {
 	req := &ProduceReq{
 		RequestHeader: RequestHeader{correlationID: 241, ClientID: "test"},
 		RequiredAcks:  RequiredAcksAll,

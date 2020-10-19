@@ -40,7 +40,7 @@ const (
 	ConsumerMetadataReqKind = 10
 	APIVersionsReqKind      = 18
 	CreateTopicsReqKind     = 19
-	DeleteTopicReqKind      = 20
+	DeleteTopicsReqKind     = 20
 )
 
 const (
@@ -2568,9 +2568,10 @@ func ReadDeleteTopicsReq(r io.Reader) (*DeleteTopicsReq, error) {
 	}
 	req.Topics = make([]string, len)
 
-	for range req.Topics {
-		req.Topics = append(req.Topics, dec.DecodeString())
+	for i := range req.Topics {
+		req.Topics[i] = dec.DecodeString()
 	}
+
 	req.Timeout = dec.DecodeDuration32()
 
 	if dec.Err() != nil {
@@ -2580,7 +2581,7 @@ func ReadDeleteTopicsReq(r io.Reader) (*DeleteTopicsReq, error) {
 }
 
 func (r DeleteTopicsReq) Kind() int16 {
-	return DeleteTopicReqKind
+	return DeleteTopicsReqKind
 }
 
 func (r *DeleteTopicsReq) Bytes() ([]byte, error) {
@@ -2593,12 +2594,11 @@ func (r *DeleteTopicsReq) Bytes() ([]byte, error) {
 	for _, topic := range r.Topics {
 		enc.EncodeString(topic)
 	}
+	enc.EncodeDuration(r.Timeout)
 
 	if enc.Err() != nil {
 		return nil, enc.Err()
 	}
-
-	enc.EncodeDuration(r.Timeout)
 
 	// update the message size information
 	b := buf.Bytes()

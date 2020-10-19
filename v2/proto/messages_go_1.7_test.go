@@ -10,10 +10,9 @@ import (
 	"time"
 )
 
-func TestProduceRequest(t *testing.T) {
+func TestProduceRequest17(t *testing.T) {
 	req := &ProduceReq{
-		CorrelationID: 241,
-		ClientID:      "test",
+		RequestHeader: RequestHeader{correlationID: 241, ClientID: "test"},
 		RequiredAcks:  RequiredAcksAll,
 		Timeout:       time.Second,
 		Topics: []ProduceReqTopic{
