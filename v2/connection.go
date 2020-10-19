@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Domoryonok/kafka/v2/proto"
+	"github.com/Adevinta/kafka/v2/proto"
 )
 
 // ErrClosed is returned as result of any request made using closed connection.

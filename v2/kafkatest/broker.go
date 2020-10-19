@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Domoryonok/kafka/v2"
-	"github.com/Domoryonok/kafka/v2/proto"
+	"github.com/Adevinta/kafka/v2"
+	"github.com/Adevinta/kafka/v2/proto"
 )
 
 var (

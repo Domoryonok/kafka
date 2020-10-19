@@ -6,7 +6,7 @@ jobs:
     docker:
       # specify the version
       - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/Domoryonok/kafka
+    working_directory: /go/src/github.com/Adevinta/kafka
     steps:
       - checkout
       - run: go get github.com/kisielk/errcheck

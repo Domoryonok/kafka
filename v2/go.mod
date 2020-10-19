@@ -1,4 +1,4 @@
-module github.com/Domoryonok/kafka/v2
+module github.com/Adevinta/kafka/v2
 
 go 1.13
 

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/fsouza/go-dockerclient"
-	"github.com/Domoryonok/kafka/v2"
+	"github.com/Adevinta/kafka/v2"
 
 	"testing"
 )

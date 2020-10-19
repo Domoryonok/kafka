@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/Domoryonok/kafka/v2/proto"
+	"github.com/Adevinta/kafka/v2/proto"
 )
 
 // ErrMxClosed is returned as a result of closed multiplexer consumption.

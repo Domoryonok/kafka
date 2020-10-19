@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Domoryonok/kafka/v2/proto"
+	"github.com/Adevinta/kafka/v2/proto"
 )
 
 const TLSCaFile = "../testkeys/ca.crt"
