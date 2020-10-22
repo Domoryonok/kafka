@@ -40,6 +40,7 @@ const (
 	ConsumerMetadataReqKind = 10
 	APIVersionsReqKind      = 18
 	CreateTopicsReqKind     = 19
+	DeleteTopicsReqKind     = 20
 )
 
 const (
@@ -2541,6 +2542,135 @@ func ReadVersionedCreateTopicsResp(r io.Reader, version int16) (*CreateTopicsRes
 			te.ErrorMessage = dec.DecodeString()
 		}
 		te.Err = errFromNo(te.ErrorCode)
+	}
+
+	if dec.Err() != nil {
+		return nil, dec.Err()
+	}
+	return &resp, nil
+}
+
+type DeleteTopicsReq struct {
+	RequestHeader
+	Topics  []string
+	Timeout time.Duration
+}
+
+func ReadDeleteTopicsReq(r io.Reader) (*DeleteTopicsReq, error) {
+	var req DeleteTopicsReq
+	dec := NewDecoder(r)
+
+	decodeHeader(dec, &req)
+
+	len, err := dec.DecodeArrayLen()
+	if err != nil {
+		return nil, err
+	}
+	req.Topics = make([]string, len)
+
+	for i := range req.Topics {
+		req.Topics[i] = dec.DecodeString()
+	}
+
+	req.Timeout = dec.DecodeDuration32()
+
+	if dec.Err() != nil {
+		return nil, dec.Err()
+	}
+	return &req, nil
+}
+
+func (r DeleteTopicsReq) Kind() int16 {
+	return DeleteTopicsReqKind
+}
+
+func (r *DeleteTopicsReq) Bytes() ([]byte, error) {
+	var buf bytes.Buffer
+	enc := NewEncoder(&buf)
+
+	encodeHeader(enc, r)
+
+	enc.EncodeArrayLen(len(r.Topics))
+	for _, topic := range r.Topics {
+		enc.EncodeString(topic)
+	}
+	enc.EncodeDuration(r.Timeout)
+
+	if enc.Err() != nil {
+		return nil, enc.Err()
+	}
+
+	// update the message size information
+	b := buf.Bytes()
+	binary.BigEndian.PutUint32(b, uint32(len(b)-4))
+
+	return b, nil
+}
+
+func (r *DeleteTopicsReq) WriteTo(w io.Writer) (int64, error) {
+	b, err := r.Bytes()
+	if err != nil {
+		return 0, err
+	}
+	n, err := w.Write(b)
+	return int64(n), err
+}
+
+type DeleteTopicError struct {
+	Topic     string
+	ErrorCode int16
+}
+
+type DeleteTopicsResp struct {
+	TopicErrors  []DeleteTopicError
+	ThrottleTime time.Duration // >= KafkaV2
+}
+
+func (r *DeleteTopicsResp) Bytes() ([]byte, error) {
+	var buf bytes.Buffer
+	enc := NewEncoder(&buf)
+
+	// message size - for now just placeholder
+	enc.EncodeInt32(0)
+
+	enc.EncodeDuration(r.ThrottleTime)
+
+	enc.EncodeArrayLen(len(r.TopicErrors))
+	for _, te := range r.TopicErrors {
+		enc.EncodeString(te.Topic)
+		enc.EncodeInt16(te.ErrorCode)
+	}
+
+	if enc.Err() != nil {
+		return nil, enc.Err()
+	}
+
+	// update the message size information
+	b := buf.Bytes()
+	binary.BigEndian.PutUint32(b, uint32(len(b)-4))
+
+	return b, nil
+}
+
+func ReadDeleteTopicsResp(r io.Reader) (*DeleteTopicsResp, error) {
+	var resp DeleteTopicsResp
+	dec := NewDecoder(r)
+
+	// total message size
+	_ = dec.DecodeInt32()
+
+	resp.ThrottleTime = dec.DecodeDuration32()
+
+	len, err := dec.DecodeArrayLen()
+	if err != nil {
+		return nil, err
+	}
+	resp.TopicErrors = make([]DeleteTopicError, len)
+
+	for i := range resp.TopicErrors {
+		var te = &resp.TopicErrors[i]
+		te.Topic = dec.DecodeString()
+		te.ErrorCode = dec.DecodeInt16()
 	}
 
 	if dec.Err() != nil {

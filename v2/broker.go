@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/optiopay/kafka/v2/proto"
+	"github.com/Adevinta/kafka/v2/proto"
 )
 
 const (
@@ -289,6 +289,23 @@ func (b *Broker) CreateTopic(topics []proto.TopicInfo, timeout time.Duration, va
 			ValidateOnly:         validateOnly,
 		}
 		resp, err = c.CreateTopic(&req)
+		return err
+	})
+	return resp, err
+}
+
+// DeleteTopic request topic delition
+func (b *Broker) DeleteTopic(topics []string, timeout time.Duration) (*proto.DeleteTopicsResp, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	var resp *proto.DeleteTopicsResp
+	err := b.callOnClusterController(func(c *connection) error {
+		var err error
+		req := proto.DeleteTopicsReq{
+			Topics:  topics,
+			Timeout: timeout,
+		}
+		resp, err = c.DeleteTopic(&req)
 		return err
 	})
 	return resp, err

@@ -1,5 +1,7 @@
 set -o xtrace
 
+cd "$(dirname "$0")"
+
 find . -type f ! -name '*.sh' ! -name '*.cnf' -delete
 rm -rf ./newcerts/
 

@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/optiopay/kafka/v2/proto"
+	"github.com/Adevinta/kafka/v2/proto"
 )
 
 // ErrClosed is returned as result of any request made using closed connection.
@@ -350,6 +350,17 @@ func (c *connection) CreateTopic(req *proto.CreateTopicsReq) (*proto.CreateTopic
 		return nil, err
 	}
 	return proto.ReadCreateTopicsResp(bytes.NewReader(b))
+}
+
+// DeleteTopic sends given deleteTopic request to kafka node and returns related
+// response.
+// Calling this method on closed connection will always return ErrClosed.
+func (c *connection) DeleteTopic(req *proto.DeleteTopicsReq) (*proto.DeleteTopicsResp, error) {
+	b, err := c.sendRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	return proto.ReadDeleteTopicsResp(bytes.NewReader(b))
 }
 
 // Produce sends given produce request to kafka node and returns related

@@ -1393,6 +1393,78 @@ func TestCreateTopics(t *testing.T) {
 
 }
 
+func TestDeleteTopics(t *testing.T) {
+	reference := []byte{
+		0, 0, 0, 24, // size
+		0, 20, //kind
+		0, 0, 0, 0, // version
+		0, 0, // CorrelationID
+		0, 0, // ClientID
+		0, 0, 0, 1, // size of []string
+		0, 4, 't', 'e', 's', 't', // topic
+		0, 0, 0, 0, // timeout
+	}
+
+	req := DeleteTopicsReq{
+		Timeout: 0,
+		Topics:  []string{"test"},
+	}
+
+	b, err := req.Bytes()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(b) != len(reference) {
+		t.Errorf("Bytes representation wrong %d/%d", len(b), len(reference))
+	}
+
+	for i := range b {
+		if b[i] != reference[i] {
+			t.Fatalf("Bytes representation wrong on %d byte", i)
+		}
+	}
+
+	req1, err := ReadDeleteTopicsReq(bytes.NewBuffer(b))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for i, topic := range req.Topics {
+		if topic != req1.Topics[i] {
+			t.Errorf("req = %+v  req1 = %+v \n", req, req1)
+		}
+	}
+
+	resp := DeleteTopicsResp{
+		TopicErrors: []DeleteTopicError{
+			DeleteTopicError{
+				ErrorCode: 0,
+				Topic:     "testtopic",
+			},
+		},
+	}
+	b1, err := resp.Bytes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp2, err := ReadDeleteTopicsResp(bytes.NewBuffer(b1))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for i, te := range resp.TopicErrors {
+		if te.ErrorCode != resp2.TopicErrors[i].ErrorCode {
+			t.Errorf("resp1 = %+v  resp2 = %+v \n", resp, resp)
+		}
+		if te.Topic != resp2.TopicErrors[i].Topic {
+			t.Errorf("resp1 = %+v  resp2 = %+v \n", resp, resp)
+		}
+
+	}
+
+}
+
 func TestVersionedCreateTopicRequest(t *testing.T) {
 	reqV0 := CreateTopicsReq{
 		Timeout:      0,
